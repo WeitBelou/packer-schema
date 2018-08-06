@@ -292,20 +292,16 @@
                         "description": "The name of the image family to which the resulting image belongs. You can create disks by specifying an image family instead of a specific image name. The image family always returns its latest image that is not deprecated."
                     },
                     "image_labels": {
-                        "type": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
                         },
                         "description": "Key/value pair labels to apply to the created image."
                     },
                     "image_licenses": {
-                        "type": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
+                        "type": "array",
+                        "items": {
+                            "type": "string"
                         },
                         "description": "Licenses to apply to the created image."
                     },
@@ -320,11 +316,9 @@
                         "default": "packer-{{uuid}}"
                     },
                     "labels": {
-                        "type": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
                         },
                         "description": "Key/value pair labels to apply to the launched instance."
                     },
@@ -334,11 +328,9 @@
                         "default": "n1-standard-1"
                     },
                     "metadata": {
-                        "type": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
                         },
                         "description": "Metadata applied to the launched instance."
                     },
@@ -373,11 +365,9 @@
                         "description": "The service account to be used for launched instance. Defaults to the project's default service account unless disable_default_service_account is true."
                     },
                     "scopes": {
-                        "type": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
+                        "type": "array",
+                        "items": {
+                            "type": "string"
                         },
                         "description": "The service account scopes for launched instance.",
                         "default": [
@@ -404,11 +394,9 @@
                         "description": "The Google Compute subnetwork id or URL to use for the launched instance. Only required if the network has been created with custom subnetting. Note, the region of the subnetwork must match the region or zone in which the VM is launched. If the value is not a URL, it will be interpolated to projects/((network_project_id))/regions/((region))/subnetworks/((subnetwork))"
                     },
                     "tags": {
-                        "type": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
+                        "type": "array",
+                        "items": {
+                            "type": "string"
                         }
                     },
                     "use_internal_ip": {
@@ -419,7 +407,7 @@
                         "type": "string",
                         "description": "Builder for creating Google Compute image",
                         "enum": ["googlecompute"]
-                    },
+                    }
                 }
             },
             "dockerBuilder": {
