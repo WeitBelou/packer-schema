@@ -414,7 +414,12 @@
                     "use_internal_ip": {
                         "type": "boolean",
                         "description": "If true, use the instance's internal IP instead of its external IP during building."
-                    }
+                    },
+                    "type": {
+                        "type": "string",
+                        "description": "Builder for creating Google Compute image",
+                        "enum": ["googlecompute"]
+                    },
                 }
             },
             "dockerBuilder": {
