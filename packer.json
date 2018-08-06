@@ -1,18 +1,18 @@
-{  
+{
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "JSON schema for Packer template files",    
+    "title": "JSON schema for Packer template files",
     "required": ["builders"],
     "properties": {
         "builders": {
             "description": "An array of one or more objects that define the builders that will be used to create machine images for this template, and configures each of those builders.",
-            "items": { "$ref": "#/definitions/builder" },            
+            "items": {"$ref": "#/definitions/builder"},
             "minItems": 1,
-            "type": "array",            
+            "type": "array",
             "uniqueItems": true
         },
         "description": {
             "description": "A string providing a description of what the template does.",
-            "type": "string"            
+            "type": "string"
         },
         "min_packer_version": {
             "description": "A string that has a minimum Packer version that is required to parse the template.",
@@ -22,17 +22,23 @@
             "description": "An array of one or more objects that define the various post-processing steps to take with the built images.",
             "items": {
                 "anyOf": [
-                    { "type": "string", "enum": ["checksum", "compress", "docker-import", "docker-push", "docker-save", "docker-tag", "shell-local"] },
-                    { "$ref": "#/definitions/postProcessor" },
-                    { "type": "array", "items": { "$ref": "#/definitions/postProcessor" } }
+                    {
+                        "type": "string",
+                        "enum": [
+                            "checksum", "compress", "docker-import", "docker-push", "docker-save", "docker-tag",
+                            "shell-local"
+                        ]
+                    },
+                    {"$ref": "#/definitions/postProcessor"},
+                    {"type": "array", "items": {"$ref": "#/definitions/postProcessor"}}
                 ]
             },
-            "type": "array"            
+            "type": "array"
         },
         "provisioners": {
             "description": "An array of one or more objects that define the provisioners that will be used to install and configure software for the machines created by each of the builders.",
-            "items": { "$ref": "#/definitions/provisioner" },
-            "type": "array"            
+            "items": {"$ref": "#/definitions/provisioner"},
+            "type": "array"
         },
         "variables": {
             "description": "An object of one or more key/value strings that defines user variables contained in the template."
@@ -51,9 +57,10 @@
                 },
                 {
                     "oneOf": [
-                        { "$ref": "#/definitions/builders/azureBuilder" },
-                        { "$ref": "#/definitions/builders/digitalOceanBuilder" },
-                        { "$ref": "#/definitions/builders/dockerBuilder" }                                
+                        {"$ref": "#/definitions/builders/azureBuilder"},
+                        {"$ref": "#/definitions/builders/digitalOceanBuilder"},
+                        {"$ref": "#/definitions/builders/googleComputeBuilder"},
+                        {"$ref": "#/definitions/builders/dockerBuilder"}
                     ]
                 }
             ]
@@ -61,7 +68,11 @@
         "builders": {
             "azureBuilder": {
                 "description": "Builder for creating an Azure VHD",
-                "required": ["capture_container_name", "capture_name_prefix", "image_offer", "image_publisher", "image_sku", "location", "os_type", "resource_group_name", "storage_account", "subscription_id", "type"],
+                "required": [
+                    "capture_container_name", "capture_name_prefix", "image_offer", "image_publisher", "image_sku",
+                    "location",
+                    "os_type", "resource_group_name", "storage_account", "subscription_id", "type"
+                ],
                 "properties": {
                     "capture_container_name": {
                         "type": "string",
@@ -121,11 +132,11 @@
                         "description": "Subscription under which the build will be performed."
                     },
                     "os_type": {
-                        "type": "string",                        
-                        "description": "If either Linux or Windows is specified Packer will automatically configure authentication credentials for the provisioned machine. For Linux this configures an SSH authorized key. For Windows this configures a WinRM certificate.",                        
+                        "type": "string",
+                        "description": "If either Linux or Windows is specified Packer will automatically configure authentication credentials for the provisioned machine. For Linux this configures an SSH authorized key. For Windows this configures a WinRM certificate.",
                         "oneOf": [
-                            { "enum": ["Linux", "Windows"] }, 
-                            { "pattern": "{{\\s*user\\s*`\\w+`\\s*}}" }
+                            {"enum": ["Linux", "Windows"]},
+                            {"pattern": "{{\\s*user\\s*`\\w+`\\s*}}"}
                         ]
                     },
                     "tenant_id": {
@@ -220,6 +231,192 @@
                     }
                 }
             },
+            "googleComputeBuilder": {
+                "description": "Builder able to create images for Google Compute Engine",
+                "required": ["project_id", "source_image", "source_image_family", "zone"],
+                "properties": {
+                    "project_id": {
+                        "type": "string",
+                        "description": "The project ID that will be used to launch instances and store images."
+                    },
+                    "source_image": {
+                        "type": "string",
+                        "description": "The source image to use to create the new image from. You can also specify source_image_family instead. If both source_image and source_image_family are specified, source_image takes precedence."
+                    },
+                    "source_image_family": {
+                        "type": "string",
+                        "description": "The source image family to use to create the new image from. The image family always returns its latest image that is not deprecated."
+                    },
+                    "zone": {
+                        "type": "string",
+                        "description": "The zone in which to launch the instance used to create the image."
+                    },
+                    "account_file": {
+                        "type": "string",
+                        "description": "The JSON file containing your account credentials. Not required if you run Packer on a GCE instance with a service account."
+                    },
+                    "accelerator_count": {
+                        "type": "number",
+                        "description": "Number of guest accelerator cards to add to the launched instance."
+                    },
+                    "accelerator_type ": {
+                        "type": "string",
+                        "description": "Full or partial URL of the guest accelerator type. GPU accelerators can only be used with \"on_host_maintenance\": \"TERMINATE\" option set."
+                    },
+                    "address": {
+                        "type": "string",
+                        "description": "The name of a pre-allocated static external IP address. Note, must be the name and not the actual IP address."
+                    },
+                    "disable_default_service_account": {
+                        "type": "boolean",
+                        "description": "If true, the default service account will not be used if service_account_email is not specified. Set this value to true and omit service_account_email to provision a VM with no service account."
+                    },
+                    "disk_name": {
+                        "type": "string",
+                        "description": "The name of the disk, if unset the instance name will be used."
+                    },
+                    "disk_size": {
+                        "type": "number",
+                        "description": "The size of the disk in GB. This defaults to 10, which is 10GB."
+                    },
+                    "disk_type": {
+                        "type": "string",
+                        "description": "Type of disk used to back your instance, like pd-ssd or pd-standard. Defaults to pd-standard."
+                    },
+                    "image_description": {
+                        "type": "string",
+                        "description": "The description of the resulting image."
+                    },
+                    "image_family": {
+                        "type": "string",
+                        "description": "The name of the image family to which the resulting image belongs. You can create disks by specifying an image family instead of a specific image name. The image family always returns its latest image that is not deprecated."
+                    },
+                    "image_labels": {
+                        "type": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        },
+                        "description": "Key/value pair labels to apply to the created image."
+                    },
+                    "image_licenses": {
+                        "type": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "description": "Licenses to apply to the created image."
+                    },
+                    "image_name": {
+                        "type": "string",
+                        "description": "The unique name of the resulting image.",
+                        "default": "packer-{{timestamp}}"
+                    },
+                    "instance_name": {
+                        "type": "string",
+                        "description": "A name to give the launched instance. Beware that this must be unique.",
+                        "default": "packer-{{uuid}}"
+                    },
+                    "labels": {
+                        "type": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        },
+                        "description": "Key/value pair labels to apply to the launched instance."
+                    },
+                    "machine_type": {
+                        "type": "string",
+                        "description": "The machine type.",
+                        "default": "n1-standard-1"
+                    },
+                    "metadata": {
+                        "type": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        },
+                        "description": "Metadata applied to the launched instance."
+                    },
+                    "network": {
+                        "type": "string",
+                        "description": "The Google Compute network id or URL to use for the launched instance. If the value is not a URL, it will be interpolated to projects/((network_project_id))/global/networks/((network)). This value is not required if a subnet is specified.",
+                        "default": "default"
+                    },
+                    "network_project_id": {
+                        "type": "string",
+                        "description": "The project ID for the network and subnetwork to use for launched instance.",
+                        "default": "project_id"
+                    },
+                    "omit_external_ip": {
+                        "type": "boolean",
+                        "description": "If true, the instance will not have an external IP. use_internal_ip must be true if this property is true."
+                    },
+                    "on_host_maintenance": {
+                        "type": "string",
+                        "description": "Sets Host Maintenance Option. Valid choices are MIGRATE and TERMINATE. Please see GCE Instance Scheduling Options, as not all machine_types support MIGRATE (i.e. machines with GPUs). If preemptible is true this can only be TERMINATE. If preemptible is false, it defaults to MIGRATE"
+                    },
+                    "preemptible": {
+                        "type": "boolean",
+                        "description": "If true, launch a preemptible instance."
+                    },
+                    "region": {
+                        "type": "string",
+                        "description": "The region in which to launch the instance."
+                    },
+                    "service_account_email": {
+                        "type": "string",
+                        "description": "The service account to be used for launched instance. Defaults to the project's default service account unless disable_default_service_account is true."
+                    },
+                    "scopes": {
+                        "type": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "description": "The service account scopes for launched instance.",
+                        "default": [
+                            "https://www.googleapis.com/auth/userinfo.email",
+                            "https://www.googleapis.com/auth/compute",
+                            "https://www.googleapis.com/auth/devstorage.full_control"
+                        ]
+                    },
+                    "source_image_project_id": {
+                        "type": "string",
+                        "description": "The project ID of the project containing the source image."
+                    },
+                    "startup_script_file": {
+                        "type": "string",
+                        "description": "The filepath to a startup script to run on the VM from which the image will be made."
+                    },
+                    "state_timeout": {
+                        "type": "string",
+                        "description": "The time to wait for instance state changes.",
+                        "default": "5m"
+                    },
+                    "subnetwork": {
+                        "type": "string",
+                        "description": "The Google Compute subnetwork id or URL to use for the launched instance. Only required if the network has been created with custom subnetting. Note, the region of the subnetwork must match the region or zone in which the VM is launched. If the value is not a URL, it will be interpolated to projects/((network_project_id))/regions/((region))/subnetworks/((subnetwork))"
+                    },
+                    "tags": {
+                        "type": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "use_internal_ip": {
+                        "type": "boolean",
+                        "description": "If true, use the instance's internal IP instead of its external IP during building."
+                    }
+                }
+            },
             "dockerBuilder": {
                 "description": "Builder for creating a Docker image.",
                 "required": ["type"],
@@ -308,9 +505,9 @@
                         "items": {
                             "type": "string"
                         },
-                        "default": ["-d","-i", "-t", "{{.Image}}", "/bin/bash"]
+                        "default": ["-d", "-i", "-t", "{{.Image}}", "/bin/bash"]
                     },
-                    "volumes": { 
+                    "volumes": {
                         "type": "object",
                         "description": "A mapping of additional volumes to mount into this container. The key of the object is the host path, the value is the container path."
                     },
@@ -324,13 +521,13 @@
         },
         "postProcessor": {
             "oneOf": [
-                { "$ref": "#/definitions/postProcessors/checksumPostProcessor" },
-                { "$ref": "#/definitions/postProcessors/compressPostProcessor" },
-                { "$ref": "#/definitions/postProcessors/dockerImportPostProcessor" },
-                { "$ref": "#/definitions/postProcessors/dockerPushPostProcessor" },
-                { "$ref": "#/definitions/postProcessors/dockerSavePostProcessor" },
-                { "$ref": "#/definitions/postProcessors/dockerTagPostProcessor" },
-                { "$ref": "#/definitions/postProcessors/localShellPostProcessor" }
+                {"$ref": "#/definitions/postProcessors/checksumPostProcessor"},
+                {"$ref": "#/definitions/postProcessors/compressPostProcessor"},
+                {"$ref": "#/definitions/postProcessors/dockerImportPostProcessor"},
+                {"$ref": "#/definitions/postProcessors/dockerPushPostProcessor"},
+                {"$ref": "#/definitions/postProcessors/dockerSavePostProcessor"},
+                {"$ref": "#/definitions/postProcessors/dockerTagPostProcessor"},
+                {"$ref": "#/definitions/postProcessors/localShellPostProcessor"}
             ]
         },
         "postProcessors": {
@@ -351,7 +548,7 @@
                         "type": "string",
                         "description": "Specify filename to store checksums."
                     },
-                     "type": {
+                    "type": {
                         "type": "string",
                         "description": "Post-processor for computing a checksum for your built artifacts.",
                         "enum": ["checksum"]
@@ -381,7 +578,7 @@
                         "type": "string",
                         "description": "The path to save the compressed archive. The archive format is inferred from the filename."
                     },
-                     "type": {
+                    "type": {
                         "type": "string",
                         "description": "Post-processor for compressing your built artifacts.",
                         "enum": ["compress"]
@@ -401,7 +598,7 @@
                         "type": "string",
                         "description": "The tag for the imported image. By default this is not set."
                     },
-                     "type": {
+                    "type": {
                         "type": "string",
                         "enum": ["docker-import"],
                         "description": "Post-processor for importing an exported Docker image in order to run other post-processors on it."
@@ -425,7 +622,7 @@
                         "type": "string",
                         "description": "The AWS access token to use."
                     },
-                     "ecr_login": {
+                    "ecr_login": {
                         "type": "boolean",
                         "description": "If true, the builder will login in order to pull the image from Amazon EC2 Container Registry (ECR).",
                         "default": false
@@ -467,7 +664,7 @@
                         "type": "string",
                         "description": "The path to save the image (e.g. foo.tar)."
                     },
-                     "type": {
+                    "type": {
                         "type": "string",
                         "description": "Post-processor for exporting a committed Docker image to a file.",
                         "enum": ["docker-save"]
@@ -491,7 +688,7 @@
                         "type": "string",
                         "description": "The tag for the imported image. By default this is not set."
                     },
-                     "type": {
+                    "type": {
                         "type": "string",
                         "description": "Post-processor for tagging a committed Docker image.",
                         "enum": ["docker-tag"]
@@ -536,7 +733,7 @@
                             "type": "string"
                         }
                     },
-                     "type": {
+                    "type": {
                         "type": "string",
                         "description": "Post-processor for running a local shell script.",
                         "enum": ["shell-local"]
@@ -566,12 +763,12 @@
                 },
                 {
                     "oneOf": [
-                        { "$ref": "#/definitions/provisioners/ansibleLocalProvisioner" },
-                        { "$ref": "#/definitions/provisioners/ansibleRemoteProvisioner" },
-                        { "$ref": "#/definitions/provisioners/fileProvisioner" },
-                        { "$ref": "#/definitions/provisioners/localShellProvisioner" },
-                        { "$ref": "#/definitions/provisioners/remoteShellProvisioner" }
-                    ] 
+                        {"$ref": "#/definitions/provisioners/ansibleLocalProvisioner"},
+                        {"$ref": "#/definitions/provisioners/ansibleRemoteProvisioner"},
+                        {"$ref": "#/definitions/provisioners/fileProvisioner"},
+                        {"$ref": "#/definitions/provisioners/localShellProvisioner"},
+                        {"$ref": "#/definitions/provisioners/remoteShellProvisioner"}
+                    ]
                 }
             ]
         },
@@ -766,7 +963,7 @@
             "remoteShellProvisioner": {
                 "description": "Provisioner for running remote shell scripts.",
                 "required": ["type"],
-                "anyOf": [{ "required": ["script"] }, { "required": ["inline"] }],
+                "anyOf": [{"required": ["script"]}, {"required": ["inline"]}],
                 "properties": {
                     "binary": {
                         "type": "boolean",
@@ -791,14 +988,14 @@
                     "inline": {
                         "description": "This is an array of commands to execute.",
                         "oneOf": [
-                            { "type": "string" },
+                            {"type": "string"},
                             {
                                 "type": "array",
                                 "items": {
                                     "type": "string"
                                 }
                             }
-                        ]                        
+                        ]
                     },
                     "inline_shebang": {
                         "type": "string",
