@@ -233,7 +233,7 @@
             },
             "googleComputeBuilder": {
                 "description": "Builder able to create images for Google Compute Engine",
-                "required": ["project_id", "source_image", "source_image_family", "zone"],
+                "required": ["project_id", "zone"],
                 "properties": {
                     "project_id": {
                         "type": "string",
@@ -408,7 +408,15 @@
                         "description": "Builder for creating Google Compute image",
                         "enum": ["googlecompute"]
                     }
-                }
+                },
+                "oneOf": [
+                    {
+                        "required": "source_image_family"
+                    },
+                    {
+                        "required": "source_image"
+                    }
+                ]
             },
             "dockerBuilder": {
                 "description": "Builder for creating a Docker image.",
