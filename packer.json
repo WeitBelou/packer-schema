@@ -411,10 +411,10 @@
                 },
                 "oneOf": [
                     {
-                        "required": "source_image_family"
+                        "required": ["source_image_family"]
                     },
                     {
-                        "required": "source_image"
+                        "required": ["source_image"]
                     }
                 ]
             },
